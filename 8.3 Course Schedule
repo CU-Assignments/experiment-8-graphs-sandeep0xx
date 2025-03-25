@@ -1,0 +1,27 @@
+from collections import deque
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: list[list[int]]) -> bool:
+        # Step 1: Build adjacency list and in-degree array
+        graph = {i: [] for i in range(numCourses)}
+        in_degree = [0] * numCourses
+
+        for a, b in prerequisites:
+            graph[b].append(a)  # Directed edge b -> a
+            in_degree[a] += 1  # Increment in-degree of course a
+
+        # Step 2: Initialize queue with courses having 0 in-degree
+        queue = deque([i for i in range(numCourses) if in_degree[i] == 0])
+        completed_courses = 0
+
+        # Step 3: Process the courses in topological order
+        while queue:
+            course = queue.popleft()
+            completed_courses += 1
+
+            for next_course in graph[course]:
+                in_degree[next_course] -= 1  # Remove dependency
+                if in_degree[next_course] == 0:
+                    queue.append(next_course)
+
+        return completed_courses == numCourses  # If all courses are completed, return True
